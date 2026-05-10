@@ -11,31 +11,32 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/Pverma-1234/CloudOps-AI-Dashboard.git'
+                git branch: 'main',
+                url: 'https://github.com/Pverma-1234/CloudOps-AI-Dashboard.git'
             }
         }
 
         stage('Build Frontend Image') {
             steps {
-                bat 'docker build -t %DOCKER_HUB%/%FRONTEND_IMAGE%:latest ./frontend'
+                sh 'docker build -t $DOCKER_HUB/$FRONTEND_IMAGE:latest ./frontend'
             }
         }
 
         stage('Build Backend Image') {
             steps {
-                bat 'docker build -t %DOCKER_HUB%/%BACKEND_IMAGE%:latest ./backend'
+                sh 'docker build -t $DOCKER_HUB/$BACKEND_IMAGE:latest ./backend'
             }
         }
 
         stage('Push Frontend Image') {
             steps {
-                bat 'docker push %DOCKER_HUB%/%FRONTEND_IMAGE%:latest'
+                sh 'docker push $DOCKER_HUB/$FRONTEND_IMAGE:latest'
             }
         }
 
         stage('Push Backend Image') {
             steps {
-                bat 'docker push %DOCKER_HUB%/%BACKEND_IMAGE%:latest'
+                sh 'docker push $DOCKER_HUB/$BACKEND_IMAGE:latest'
             }
         }
     }
