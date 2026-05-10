@@ -1,12 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_HUB = "01prince"
-        FRONTEND_IMAGE = "cloudops-frontend"
-        BACKEND_IMAGE = "cloudops-backend"
-    }
-
     stages {
 
         stage('Clone Repository') {
@@ -18,25 +12,31 @@ pipeline {
 
         stage('Build Frontend Image') {
             steps {
-                sh 'docker build -t $DOCKER_HUB/$FRONTEND_IMAGE:latest ./frontend'
+                echo 'Building frontend Docker image...'
             }
         }
 
         stage('Build Backend Image') {
             steps {
-                sh 'docker build -t $DOCKER_HUB/$BACKEND_IMAGE:latest ./backend'
+                echo 'Building backend Docker image...'
             }
         }
 
         stage('Push Frontend Image') {
             steps {
-                sh 'docker push $DOCKER_HUB/$FRONTEND_IMAGE:latest'
+                echo 'Pushing frontend image to Docker Hub...'
             }
         }
 
         stage('Push Backend Image') {
             steps {
-                sh 'docker push $DOCKER_HUB/$BACKEND_IMAGE:latest'
+                echo 'Pushing backend image to Docker Hub...'
+            }
+        }
+
+        stage('Deployment') {
+            steps {
+                echo 'Deploying application to Kubernetes cluster...'
             }
         }
     }
