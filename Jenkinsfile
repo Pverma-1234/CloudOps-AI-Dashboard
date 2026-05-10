@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_HUB = "01prince"
+        FRONTEND_IMAGE = "cloudops-frontend"
+        BACKEND_IMAGE = "cloudops-backend"
+    }
+
+    stages {
+
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/01prince/CloudOps-AI-Dashboard.git'
+            }
+        }
+
+        stage('Build Frontend Image') {
+            steps {
+                bat 'docker build -t %DOCKER_HUB%/%FRONTEND_IMAGE%:latest ./frontend'
+            }
+        }
+
+        stage('Build Backend Image') {
+            steps {
+                bat 'docker build -t %DOCKER_HUB%/%BACKEND_IMAGE%:latest ./backend'
+            }
+        }
+
+        stage('Push Frontend Image') {
+            steps {
+                bat 'docker push %DOCKER_HUB%/%FRONTEND_IMAGE%:latest'
+            }
+        }
+
+        stage('Push Backend Image') {
+            steps {
+                bat 'docker push %DOCKER_HUB%/%BACKEND_IMAGE%:latest'
+            }
+        }
+    }
+}
