@@ -11,7 +11,7 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Pverma-1234/CloudOps-AI-Dashboard.git'
+                git branch: 'main', url: 'https://github.com/Pverma-1234/CloudOps-AI-Dashboard.git'
             }
         }
 
