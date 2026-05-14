@@ -1,6 +1,53 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Signup() {
+
+  const navigate = useNavigate();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [message, setMessage] = useState("");
+
+  const handleSignup = async () => {
+
+    try {
+
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        {
+          name,
+          email,
+          password,
+        }
+      );
+
+      console.log(response.data);
+      localStorage.setItem("userName", name);
+
+      setMessage("Account Created Successfully");
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
+
+    } catch (error) {
+
+      if (error.response?.data?.message) {
+
+        setMessage(error.response.data.message);
+
+      } else {
+
+        setMessage("Signup Failed");
+
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#050816] flex items-center justify-center px-6 text-white relative overflow-hidden">
 
@@ -34,6 +81,8 @@ function Signup() {
             <input
               type="text"
               placeholder="Enter your full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="w-full p-4 rounded-2xl bg-black border border-gray-700 focus:border-cyan-400 outline-none transition"
             />
           </div>
@@ -46,6 +95,8 @@ function Signup() {
             <input
               type="email"
               placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full p-4 rounded-2xl bg-black border border-gray-700 focus:border-cyan-400 outline-none transition"
             />
           </div>
@@ -58,11 +109,22 @@ function Signup() {
             <input
               type="password"
               placeholder="Create password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full p-4 rounded-2xl bg-black border border-gray-700 focus:border-cyan-400 outline-none transition"
             />
           </div>
 
-          <button className="w-full bg-cyan-500 hover:bg-cyan-400 p-4 rounded-2xl text-lg font-bold transition hover:scale-105">
+          {message && (
+            <p className="text-center text-cyan-400 font-semibold">
+              {message}
+            </p>
+          )}
+
+          <button
+            onClick={handleSignup}
+            className="w-full bg-cyan-500 hover:bg-cyan-400 p-4 rounded-2xl text-lg font-bold transition hover:scale-105"
+          >
             Create Account
           </button>
 

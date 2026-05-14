@@ -1,51 +1,40 @@
-import { Link } from "react-router-dom";
-
+import Sidebar from "../components/Sidebar";
+import { useDeployment } from "../context/DeploymentContext";
+import { useState } from "react";
 function Dashboard() {
+  
+  const userName = localStorage.getItem("userName");
+  const [showModal, setShowModal] = useState(false);
+
+const [appName, setAppName] = useState("");
+const { deployments, addDeployment } = useDeployment();
+
+const handleDeployment = () => {
+
+  if (!appName) return;
+
+  addDeployment({
+    service: appName,
+    environment: "Production",
+    version: "v1.0.0",
+    replicas: 2,
+    pods: 2,
+    image: `${appName.toLowerCase()}:v1`,
+  });
+
+  setAppName("");
+
+  setShowModal(false);
+};
+
+    
+
+  
   return (
     <div className="bg-[#050816] min-h-screen text-white flex">
 
-      {/* Sidebar */}
-      <div className="w-[280px] bg-[#0f172a] border-r border-gray-800 p-8 hidden lg:block">
+    <Sidebar />
 
-        <h1 className="text-4xl font-bold text-cyan-400 mb-12">
-          CloudOps
-        </h1>
-
-        <div className="space-y-6 text-lg">
-
-          <Link to="/dashboard">
-            <div className="bg-cyan-500/20 text-cyan-400 p-4 rounded-2xl cursor-pointer">
-              Dashboard
-            </div>
-          </Link>
-
-          <Link to="/kubernetes">
-            <div className="hover:bg-[#1e293b] p-4 rounded-2xl cursor-pointer transition">
-              Kubernetes
-            </div>
-          </Link>
-
-          <Link to="/cicd">
-            <div className="hover:bg-[#1e293b] p-4 rounded-2xl cursor-pointer transition">
-              CI/CD Pipelines
-            </div>
-          </Link>
-
-          <Link to="/monitoring">
-            <div className="hover:bg-[#1e293b] p-4 rounded-2xl cursor-pointer transition">
-              Monitoring
-            </div>
-          </Link>
-
-          <Link to="/security">
-            <div className="hover:bg-[#1e293b] p-4 rounded-2xl cursor-pointer transition">
-              Security
-            </div>
-          </Link>
-
-        </div>
-
-      </div>
 
       {/* Main Content */}
       <div className="flex-1 p-8 overflow-y-auto">
@@ -58,6 +47,9 @@ function Dashboard() {
             <h1 className="text-5xl font-bold mb-3">
               DevOps Dashboard
             </h1>
+            <p className="text-cyan-400 text-xl mt-2">
+              Welcome, {userName} 👋
+            </p>
 
             <p className="text-gray-400 text-xl">
               Monitor infrastructure, deployments & Kubernetes clusters.
@@ -65,9 +57,12 @@ function Dashboard() {
 
           </div>
 
-          <button className="bg-cyan-500 hover:bg-cyan-400 px-8 py-4 rounded-2xl text-lg font-bold transition hover:scale-105">
-            New Deployment
-          </button>
+<button
+  onClick={() => setShowModal(true)}
+  className="bg-cyan-500 hover:bg-cyan-400 px-8 py-4 rounded-2xl text-lg font-bold transition hover:scale-105"
+>
+  New Deployment
+</button>
 
         </div>
 
@@ -76,7 +71,7 @@ function Dashboard() {
 
           <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 pb-16">
             <h2 className="text-5xl font-bold text-cyan-400">
-              24
+              {deployments.length * 2}
             </h2>
 
             <p className="text-gray-400 mt-4 text-lg">
@@ -86,7 +81,7 @@ function Dashboard() {
 
           <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
             <h2 className="text-5xl font-bold text-cyan-400">
-              12
+              {deployments.length}
             </h2>
 
             <p className="text-gray-400 mt-4 text-lg">
@@ -96,7 +91,7 @@ function Dashboard() {
 
           <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
             <h2 className="text-5xl font-bold text-cyan-400">
-              99.9%
+              {99 + deployments.length / 10}%
             </h2>
 
             <p className="text-gray-400 mt-4 text-lg">
@@ -106,7 +101,7 @@ function Dashboard() {
 
           <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
             <h2 className="text-5xl font-bold text-cyan-400">
-              1.2M
+              {deployments.length * 100}K
             </h2>
 
             <p className="text-gray-400 mt-4 text-lg">
@@ -148,28 +143,31 @@ function Dashboard() {
 
             <tbody>
 
-              <tr className="border-b border-gray-800">
-                <td className="py-6">Frontend Service</td>
-                <td>Production</td>
-                <td className="text-green-400">Healthy</td>
-                <td>v2.1.0</td>
-              </tr>
+  {deployments.map((deployment, index) => (
 
-              <tr className="border-b border-gray-800">
-                <td className="py-6">Backend API</td>
-                <td>Production</td>
-                <td className="text-green-400">Healthy</td>
-                <td>v1.8.2</td>
-              </tr>
+    <tr key={index} className="border-b border-gray-800">
 
-              <tr>
-                <td className="py-6">Jenkins Pipeline</td>
-                <td>CI/CD</td>
-                <td className="text-cyan-400">Running</td>
-                <td>v3.0.1</td>
-              </tr>
+      <td className="py-6">
+        {deployment.service}
+      </td>
 
-            </tbody>
+      <td>
+        {deployment.environment}
+      </td>
+
+      <td className="text-green-400">
+        {deployment.status}
+      </td>
+
+      <td>
+        {deployment.version}
+      </td>
+
+    </tr>
+
+  ))}
+
+</tbody>
 
           </table>
 
@@ -179,7 +177,7 @@ function Dashboard() {
 <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-10">
 
   {/* Deployment Chart */}
-  <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
+<div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
 
     <div className="flex items-center justify-between mb-8">
 
@@ -233,6 +231,96 @@ function Dashboard() {
     </div>
 
   </div>
+  {/* Dynamic Deployment Trends
+<div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
+
+  <div className="flex items-center justify-between mb-8">
+    <h2 className="text-white text-xl">
+  Deployments: {deployments.length}
+</h2>
+
+    <h2 className="text-3xl font-bold">
+      Deployment Trends
+    </h2>
+
+    <span className="text-cyan-400">
+      Weekly
+    </span>
+
+  </div>
+
+  {(() => {
+
+    const days = [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+    ];
+
+    const currentDay = new Date().getDay();
+
+    const deploymentData = [
+      40,
+      55,
+      48,
+      72,
+      65,
+      58,
+      50,
+    ];
+
+    deploymentData[currentDay] +=
+      deployments.length * 25;
+
+    return (
+
+      <div className="flex items-end justify-between h-[250px] gap-4">
+
+        {deploymentData.map((height, index) => (
+
+          <div
+            key={index}
+            className="flex flex-col items-center flex-1"
+          >
+
+            <div
+              className={`w-full rounded-t-2xl transition-all duration-500 ${
+                index === currentDay
+                  ? "bg-cyan-400"
+                  : "bg-cyan-700"
+              }`}
+              style={{
+                height: `${height}%`,
+              }}
+            ></div>
+
+            <span
+              className={`mt-4 ${
+                index === currentDay
+                  ? "text-cyan-400"
+                  : "text-gray-400"
+              }`}
+            >
+
+              {days[index]}
+
+            </span>
+
+          </div>
+
+        ))}
+
+      </div>
+
+    );
+
+  })()}
+
+</div> */}
 
   {/* Traffic Chart */}
   <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
@@ -310,7 +398,7 @@ function Dashboard() {
     </div>
 
           {/* Deployment Activity */}
-<div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 mt-10">
+{/* <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 mt-10">
 
   <div className="flex items-center justify-between mb-8">
 
@@ -360,9 +448,144 @@ function Dashboard() {
 
   </div>
 
+</div> */}
+{/* Real Deployment Activity */}
+<div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 mt-10">
+
+  <div className="flex items-center justify-between mb-8">
+
+    <h2 className="text-3xl font-bold">
+      Deployment Activity
+    </h2>
+
+    <span className="text-green-400">
+      Live
+    </span>
+
+  </div>
+
+  <div className="space-y-6">
+
+    {deployments.map((deployment, index) => (
+
+      <div
+        key={index}
+        className="bg-[#111827] p-6 rounded-2xl"
+      >
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+
+          <div>
+
+            <h2 className="text-cyan-400 text-xl font-bold">
+
+              {deployment.service}
+
+            </h2>
+
+            <p className="text-gray-400 text-sm mt-1">
+
+              {deployment.environment}
+
+            </p>
+
+          </div>
+
+          <span
+            className={`font-semibold ${
+              deployment.status === "Healthy"
+                ? "text-green-400"
+                : "text-cyan-400"
+            }`}
+          >
+
+            {deployment.status}
+
+          </span>
+
+        </div>
+
+
+        {/* Recent Logs */}
+        <div className="space-y-3">
+
+          {deployment.logs
+            .slice(-3)
+            .reverse()
+            .map((log, i) => (
+
+              <div
+                key={i}
+                className="flex items-center justify-between bg-[#0f172a] p-3 rounded-xl"
+              >
+
+                <span className="text-gray-300">
+                  {log}
+                </span>
+
+                <span className="text-gray-500 text-sm">
+
+                  {i + 1} min ago
+
+                </span>
+
+              </div>
+
+            ))}
+
+        </div>
+
+      </div>
+
+    ))}
+
+  </div>
+
 </div>
 
         </div>
+        {showModal && (
+
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+
+    <div className="bg-[#0f172a] p-8 rounded-3xl w-[400px] border border-gray-700">
+
+      <h2 className="text-3xl font-bold text-cyan-400 mb-6">
+        New Deployment
+      </h2>
+
+      <input
+        type="text"
+        placeholder="Enter Application Name"
+        value={appName}
+        onChange={(e) => setAppName(e.target.value)}
+        className="w-full p-4 rounded-2xl bg-black border border-gray-700 mb-6 outline-none"
+      />
+
+      <div className="flex gap-4">
+
+        <button
+          onClick={handleDeployment}
+          className="flex-1 bg-cyan-500 hover:bg-cyan-400 p-4 rounded-2xl font-bold"
+        >
+          Deploy
+        </button>
+
+        <button
+          onClick={() => setShowModal(false)}
+          className="flex-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 p-4 rounded-2xl"
+        >
+          Cancel
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+)}
 
       </div>
 

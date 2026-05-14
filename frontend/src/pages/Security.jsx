@@ -1,6 +1,21 @@
+import { useDeployment } from "../context/DeploymentContext";
+import { IoArrowBack } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
 function Security() {
+  const { deployments,runSecurityScan } = useDeployment();
+  const navigate = useNavigate();
   return (
-    <div className="bg-[#050816] min-h-screen text-white p-8">
+    <div className="bg-[#050816] min-h-screen text-white flex">
+      <Sidebar />
+      <div className="flex-1 p-8 overflow-y-auto">
+      
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="mb-6 bg-[#0f172a] hover:bg-[#1e293b] p-3 rounded-xl transition"
+      >
+        <IoArrowBack className="text-2xl text-cyan-400" />
+      </button>
 
       {/* Header */}
       <div className="flex items-center justify-between mb-10">
@@ -16,10 +31,25 @@ function Security() {
           </p>
 
         </div>
+          <button
+            onClick={() => {
 
-        <button className="bg-cyan-500 hover:bg-cyan-400 px-6 py-3 rounded-2xl font-bold transition">
+            if (deployments.length === 0) {
+
+              alert("No deployments available for scanning");
+
+              return;
+            }
+
+            runSecurityScan();
+
+          }}
+          className="bg-cyan-500 hover:bg-cyan-400 px-6 py-3 rounded-2xl font-bold transition"
+        >
           Run Security Scan
         </button>
+
+
 
       </div>
 
@@ -29,7 +59,7 @@ function Security() {
         <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
 
           <h2 className="text-5xl font-bold text-cyan-400">
-            97%
+            {95 + deployments.length}%
           </h2>
 
           <p className="text-gray-400 mt-4">
@@ -41,7 +71,7 @@ function Security() {
         <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
 
           <h2 className="text-5xl font-bold text-cyan-400">
-            12
+            {deployments.length * 2}
           </h2>
 
           <p className="text-gray-400 mt-4">
@@ -53,7 +83,7 @@ function Security() {
         <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
 
           <h2 className="text-5xl font-bold text-cyan-400">
-            4
+            {deployments.length}
           </h2>
 
           <p className="text-gray-400 mt-4">
@@ -65,7 +95,7 @@ function Security() {
         <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
 
           <h2 className="text-5xl font-bold text-cyan-400">
-            99.9%
+            {90 + deployments.length}%
           </h2>
 
           <p className="text-gray-400 mt-4">
@@ -75,77 +105,121 @@ function Security() {
         </div>
 
       </div>
+      {/* Live Security Reports */}
+      <div className="space-y-8 mt-10 mb-12">
 
-      {/* Vulnerability Overview */}
-      <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 mb-12">
+        {deployments.map((deployment, index) => (
 
-        <div className="flex items-center justify-between mb-8">
+        <div
+          key={index}
+          className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8"
+        >
 
-          <h2 className="text-3xl font-bold">
-            Vulnerability Overview
+      <div className="flex items-center justify-between mb-6">
+
+        <div>
+
+          <h2 className="text-3xl font-bold text-cyan-400">
+            {deployment.service}
           </h2>
 
+          <p className="text-gray-400 mt-2">
+            DevSecOps Security Report
+          </p>
+
+        </div>
+
+        <span className="text-green-400">
+          Secure
+        </span>
+
+      </div>
+
+      <div className="space-y-4">
+
+        <div className="bg-[#111827] p-4 rounded-2xl flex justify-between">
+
+          <span>
+            Container Vulnerability Scan
+          </span>
+
           <span className="text-green-400">
-            Protected
+            Passed
           </span>
 
         </div>
 
-        <table className="w-full text-left">
+        <div className="bg-[#111827] p-4 rounded-2xl flex justify-between">
 
-          <thead>
+          <span>
+            OWASP Security Check
+          </span>
 
-            <tr className="border-b border-gray-800 text-gray-400">
+          <span className="text-green-400">
+            Passed
+          </span>
 
-              <th className="pb-4">Service</th>
-              <th className="pb-4">Risk Level</th>
-              <th className="pb-4">Status</th>
-              <th className="pb-4">Last Scan</th>
+        </div>
 
-            </tr>
+        <div className="bg-[#111827] p-4 rounded-2xl flex justify-between">
 
-          </thead>
+          <span>
+            Secrets Detection
+          </span>
 
-          <tbody>
+          <span className="text-yellow-400">
+            Warning
+          </span>
 
-            <tr className="border-b border-gray-800">
+        </div>
 
-              <td className="py-5">Frontend Container</td>
-              <td className="text-green-400">
-                Low
-              </td>
-              <td>Secure</td>
-              <td>2 min ago</td>
+        <div className="bg-[#111827] p-4 rounded-2xl flex justify-between">
 
-            </tr>
+          <span>
+            Compliance Status
+          </span>
 
-            <tr className="border-b border-gray-800">
+          <span className="text-green-400">
+            Compliant
+          </span>
 
-              <td className="py-5">Backend API</td>
-              <td className="text-yellow-400">
-                Medium
-              </td>
-              <td>Monitoring</td>
-              <td>5 min ago</td>
-
-            </tr>
-
-            <tr>
-
-              <td className="py-5">Kubernetes Cluster</td>
-              <td className="text-green-400">
-                Low
-              </td>
-              <td>Protected</td>
-              <td>10 min ago</td>
-
-            </tr>
-
-          </tbody>
-
-        </table>
+        </div>
 
       </div>
+
+      {/* Risk Score */}
+      <div className="mt-8">
+
+        <div className="flex justify-between mb-2">
+
+          <span>Risk Score</span>
+
+          <span>
+            {20 + index * 10}%
+          </span>
+
+        </div>
+
+        <div className="w-full bg-gray-800 h-4 rounded-full">
+
+          <div
+            className="bg-cyan-400 h-4 rounded-full"
+            style={{
+              width: `${20 + index * 10}%`,
+            }}
+          ></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  ))}
+
+</div>
+
+
 
       {/* Security Analytics */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12">
@@ -201,63 +275,85 @@ function Security() {
           </div>
 
         </div>
+        {/* Live Security Logs */}
+        <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8 h-[500px] overflow-y-auto">
 
-        {/* Security Logs */}
-        <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
+        <div className="flex items-center justify-between mb-8">
 
-          <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold">
+            Security Logs
+          </h2>
 
-            <h2 className="text-3xl font-bold">
-              Security Logs
-            </h2>
+        <span className="text-cyan-400">
+          Real-Time
+        </span>
 
-            <span className="text-cyan-400">
-              Real-Time
-            </span>
+      </div>
 
-          </div>
+      <div className="space-y-6">
 
-          <div className="space-y-5">
+          {deployments.map((deployment, index) => (
 
-            <div className="bg-[#111827] rounded-2xl p-5 flex items-center justify-between">
+        <div
+          key={index}
+          className="bg-[#111827] rounded-2xl p-5"
+        >
 
-              <span>
-                Trivy container scan completed
-              </span>
+        <div className="flex items-center justify-between mb-4">
 
-              <span className="text-gray-400">
-                2 min ago
-              </span>
+          <span className="text-cyan-400 font-bold">
+            {deployment.service}
+          </span>
 
-            </div>
-
-            <div className="bg-[#111827] rounded-2xl p-5 flex items-center justify-between">
-
-              <span>
-                Kubernetes RBAC policy verified
-              </span>
-
-              <span className="text-gray-400">
-                7 min ago
-              </span>
-
-            </div>
-
-            <div className="bg-[#111827] rounded-2xl p-5 flex items-center justify-between">
-
-              <span>
-                Dependency vulnerability resolved
-              </span>
-
-              <span className="text-gray-400">
-                10 min ago
-              </span>
-
-            </div>
-
-          </div>
+          <span className="text-gray-400">
+            Secure
+          </span>
 
         </div>
+
+        <div className="space-y-3">
+
+          {deployment.logs
+            .filter(
+              (log) =>
+
+                log.includes("Security") ||
+
+                log.includes("OWASP") ||
+
+                log.includes("Compliance") ||
+
+                log.includes("scan") ||
+
+                log.includes("Scanning")
+            )
+            .map((log, i) => (
+
+              <div
+                key={i}
+                className="flex items-center justify-between"
+              >
+
+                <span>{log}</span>
+
+                <span className="text-gray-400">
+                  {i + 1} min ago
+                </span>
+
+              </div>
+
+                  ))}
+
+                </div>
+
+              </div>
+
+              ))}
+
+            </div>
+
+          </div>
+
 
       </div>
 
@@ -322,6 +418,7 @@ function Security() {
 
       </div>
 
+    </div>
     </div>
   );
 }

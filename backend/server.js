@@ -10,13 +10,29 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use("/api/auth", authRoutes);
-
+const { exec } = require("child_process");
 app.get("/", (req, res) => {
+  // exec('node -e "setTimeout(()=>{}, 10000)"');
   res.send("CloudOps Backend Running 🚀");
 });
+app.get("/api/stress", (req, res) => {
+  exec('node -e "for(let i=0;i<1e9;i++){}"');
+
+  res.json({
+    message: "CPU stress triggered"
+  });
+});
+  
+
 
 const PORT = process.env.PORT || 5000;
 
