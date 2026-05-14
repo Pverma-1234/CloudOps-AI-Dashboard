@@ -1,13 +1,82 @@
+import { useState } from "react";
 import { useDeployment } from "../context/DeploymentContext";
 import { IoArrowBack } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 
 function CICD() {
-
+  const [pipelineStatus, setPipelineStatus] = useState("Idle");
+  const [pipelineLogs, setPipelineLogs] = useState([]);
+  const [activeStage, setActiveStage] = useState("");
   const { deployments,triggerPipeline } = useDeployment();
 
   const navigate = useNavigate();
+  const startPipeline = () => {
+
+  setPipelineStatus("Running");
+
+  setPipelineLogs([
+    "Connecting to GitHub Actions..."
+  ]);
+
+  setActiveStage("GitHub");
+
+  setTimeout(() => {
+
+    setPipelineLogs((prev) => [
+      ...prev,
+      "Terraform Init Started..."
+    ]);
+
+    setActiveStage("Terraform");
+
+  }, 2000);
+
+  setTimeout(() => {
+
+    setPipelineLogs((prev) => [
+      ...prev,
+      "Terraform Apply Successful ✅"
+    ]);
+
+  }, 4000);
+
+  setTimeout(() => {
+
+    setPipelineLogs((prev) => [
+      ...prev,
+      "Docker Image Build Started..."
+    ]);
+
+    setActiveStage("Docker");
+
+  }, 6000);
+
+  setTimeout(() => {
+
+    setPipelineLogs((prev) => [
+      ...prev,
+      "Kubernetes Deployment Started..."
+    ]);
+
+    setActiveStage("Kubernetes");
+
+  }, 8000);
+
+  setTimeout(() => {
+
+    setPipelineLogs((prev) => [
+      ...prev,
+      "Production Deployment Successful 🚀"
+    ]);
+
+    setPipelineStatus("Success");
+
+    setActiveStage("Production");
+
+  }, 10000);
+
+  };
 
   return (
 
@@ -40,23 +109,11 @@ function CICD() {
           </div>
 
           <button
-            onClick={() => {
-
-            if (deployments.length === 0) {
-
-              alert("No deployment available");
-
-              return;
-            }
-
-            triggerPipeline();
-
-          }}
-          className="bg-cyan-500 hover:bg-cyan-400 px-6 py-3 rounded-2xl font-bold transition"
-        >
-          Trigger Pipeline
-        </button>
-
+            onClick={startPipeline}
+              className="bg-cyan-500 hover:bg-cyan-400 px-6 py-3 rounded-2xl font-bold"
+            >
+            Trigger Pipeline
+          </button>
         </div>
 
         {/* Stats Cards */}
@@ -192,6 +249,44 @@ function CICD() {
           </div>
 
         </div>
+        <div className="mt-10 bg-[#0f172a] border border-gray-800 rounded-3xl p-8">
+
+  <div className="flex justify-between items-center mb-6">
+
+    <h2 className="text-3xl font-bold text-white">
+      Live Pipeline Status
+    </h2>
+
+    <span className={`font-bold ${
+      pipelineStatus === "Running"
+        ? "text-yellow-400"
+        : "text-green-400"
+    }`}>
+      {pipelineStatus}
+    </span>
+
+  </div>
+
+  <h3 className="text-cyan-400 text-xl mb-4">
+    Active Stage: {activeStage}
+  </h3>
+
+  <div className="bg-black rounded-2xl p-6 h-[300px] overflow-y-auto">
+
+    {pipelineLogs.map((log, index) => (
+
+      <p
+        key={index}
+        className="text-green-400 mb-3 font-mono"
+      >
+        {log}
+      </p>
+
+    ))}
+
+  </div>
+
+</div>
 
         {/* Live Pipelines */}
         <div className="space-y-8 mt-10">
